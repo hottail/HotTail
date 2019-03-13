@@ -119,6 +119,19 @@
     <Compile Include="HotTailCore.cs" />
     <Compile Include="HotTail_Plugin.cs" />
     <Compile Include="IManipulator.cs" />
+    <Compile Include="DeviceFeatureConfigPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DeviceFeatureConfigPanel.Designer.cs">
+      <DependentUpon>DeviceFeatureConfigPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LevelChangedEventArgs.cs" />
+    <Compile Include="manipulators\CritDirectHitManipulatorSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="manipulators\CritDirectHitManipulatorSettings.Designer.cs">
+      <DependentUpon>CritDirectHitManipulatorSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="manipulators\NoActionManipulator.cs" />
     <Compile Include="manipulators\CritDirectHitManipulator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -137,6 +150,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DevicePanel.resx">
       <DependentUpon>DevicePanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceFeatureConfigPanel.resx">
+      <DependentUpon>DeviceFeatureConfigPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="manipulators\CritDirectHitManipulatorSettings.resx">
+      <DependentUpon>CritDirectHitManipulatorSettings.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

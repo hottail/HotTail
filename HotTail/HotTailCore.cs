@@ -26,6 +26,7 @@ namespace HotTail
 
         // Task References
         protected System.Timers.Timer DataUpdateTimer;
+        private long LastDataUpdateTick = DateTime.Now.Ticks;
 
         // Buttplug.io
         public ButtplugClient DeviceClient;
@@ -92,7 +93,7 @@ namespace HotTail
             {
                 Interval = 100
             };
-            DataUpdateTimer.Elapsed += (a, b) => DataUpdate();
+            DataUpdateTimer.Elapsed += DataUpdate;
 
             // UI Init
             controlPanel = new ControlPanel();
@@ -104,6 +105,11 @@ namespace HotTail
             DataUpdateTimer.Start();
 
             SetRunningStatus();
+        }
+
+        private void DataUpdateTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void DeviceClient_DeviceRemoved(object sender, DeviceRemovedEventArgs e)
@@ -156,11 +162,13 @@ namespace HotTail
             }
         }
 
-        public void DataUpdate()
+        public void DataUpdate(object sender, System.Timers.ElapsedEventArgs e)
         {
+            var ticksElapsed = Math.Max(0, e.SignalTime.Ticks - LastDataUpdateTick); // ticks elapsed since last update, and making sure those are positive.
+            LastDataUpdateTick = e.SignalTime.Ticks;
             foreach (var manager in DeviceManagers.Values)
             {
-                manager.Update();
+                manager.Update(ticksElapsed);
             }
         }
 

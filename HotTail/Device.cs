@@ -28,7 +28,7 @@ namespace HotTail
                 ManipulatorMapping[feature] = new List<IManipulator>();
                 for (int i = 0; i < device.AllowedMessages[feature].FeatureCount; i++)
                 {
-                    ManipulatorMapping[feature].Add(new CritDirectHitManipulator());
+                    ManipulatorMapping[feature].Add(new NoActionManipulator());
                 }
             }
 
@@ -61,28 +61,52 @@ namespace HotTail
                 {
                     var currentIndex = i;
                     var currentManipulator = mapping.Value[i];
-                    GroupBox settingsGroup = new GroupBox()
+
+                    // Setup Panel
+                    DeviceFeatureConfigPanel configPanel = new DeviceFeatureConfigPanel();
+                    configPanel.Dock = DockStyle.Top;
+
+                    // Setup Level Display
+                    configPanel.levelDisplay.Value = (int)Math.Round(currentManipulator.Level * 100);
+
+                    EventHandler handleLevelChange = (o, e) =>
+                    {
+                        configPanel.levelDisplay.Value = (int)Math.Round(((LevelChangedEventArgs)e).Level * 100);
+                    };
+                    currentManipulator.LevelChanged += handleLevelChange;
+
+                    // Setup Available Manipulators
+                    configPanel.availableManipulators.Dock = DockStyle.Left;
+                    configPanel.availableManipulators.BindingContext = new BindingContext();
+                    configPanel.availableManipulators.DataSource = HotTailCore.Instance.AvailableManipulators.Select(x => ((IManipulator)Activator.CreateInstance(x)).Descriptor).ToList();
+                    configPanel.availableManipulators.SelectedIndex = HotTailCore.Instance.AvailableManipulators.FindIndex(x => x == currentManipulator.GetType());
+                    configPanel.availableManipulators.SelectedValueChanged += (o, e) =>
+                    {
+                        var index = configPanel.availableManipulators.SelectedIndex;
+                        var availableManipulators = HotTailCore.Instance.AvailableManipulators;
+                        var selectedManipulator = availableManipulators[index];
+                        var manipInstance = (IManipulator)Activator.CreateInstance(selectedManipulator);
+                        configPanel.levelDisplay.Value = (int)Math.Round(manipInstance.Level * 100);
+                        manipInstance.LevelChanged += handleLevelChange;
+                        configPanel.manipulatorSettings.Controls.Clear();
+                        var manipSettings = manipInstance.ManipulatorSettings;
+                        manipSettings.Dock = DockStyle.Fill;
+                        configPanel.manipulatorSettings.Controls.Add(manipSettings);
+                        mapping.Value[currentIndex] = manipInstance;
+                    };
+                    configPanel.manipulatorSettings.Controls.Clear();
+                    var currentManipSettings = currentManipulator.ManipulatorSettings;
+                    currentManipSettings.Dock = DockStyle.Fill;
+                    configPanel.manipulatorSettings.Controls.Add(currentManipSettings);
+
+
+                    // Display the thing
+                    var featureTab = new TabPage
                     {
                         Text = typeName + " " + (i + 1)
                     };
-
-                    // ToDo: What the fuck even is this... it seems to work? But my god... fml.
-                    ListBox manipulatorSelect = new ListBox();
-                    manipulatorSelect.Dock = DockStyle.Left;
-                    manipulatorSelect.BindingContext = new BindingContext();
-                    manipulatorSelect.DataSource = HotTailCore.Instance.AvailableManipulators.Select(x => ((IManipulator)Activator.CreateInstance(x)).Descriptor).ToList();
-                    manipulatorSelect.SelectedIndex = HotTailCore.Instance.AvailableManipulators.FindIndex(x => x == currentManipulator.GetType());
-                    manipulatorSelect.SelectedValueChanged += (o, e) =>
-                    {
-                        var index = manipulatorSelect.SelectedIndex;
-                        var availableManipulators = HotTailCore.Instance.AvailableManipulators;
-                        var selectedManipulator = availableManipulators[index];
-                        var manipInstance = Activator.CreateInstance(selectedManipulator);
-                        mapping.Value[currentIndex] = ((IManipulator)manipInstance);
-                    };
-
-                    settingsGroup.Controls.Add(manipulatorSelect);
-                    devicePanel.flowLayout.Controls.Add(settingsGroup);
+                    featureTab.Controls.Add(configPanel);
+                    devicePanel.featureTabs.TabPages.Add(featureTab);
                 }
             }
 
@@ -101,14 +125,14 @@ namespace HotTail
             }
         }
 
-        public void Update()
+        public void Update(long ticksElapsed)
         {
             foreach (var typeMappings in ManipulatorMapping)
             {
                 var results = new List<double>();
                 foreach (var manipulator in typeMappings.Value)
                 {
-                    manipulator.DataUpdate();
+                    manipulator.DataUpdate(ticksElapsed);
                     results.Add(manipulator.Level);
                 }
 

@@ -28,24 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.flowLayout = new System.Windows.Forms.FlowLayoutPanel();
+            this.featureTabs = new System.Windows.Forms.TabControl();
             this.SuspendLayout();
             // 
-            // flowLayout
+            // featureTabs
             // 
-            this.flowLayout.AutoScroll = true;
-            this.flowLayout.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayout.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.flowLayout.Location = new System.Drawing.Point(0, 0);
-            this.flowLayout.Name = "flowLayout";
-            this.flowLayout.Size = new System.Drawing.Size(2119, 1278);
-            this.flowLayout.TabIndex = 0;
+            this.featureTabs.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.featureTabs.Location = new System.Drawing.Point(0, 0);
+            this.featureTabs.Name = "featureTabs";
+            this.featureTabs.SelectedIndex = 0;
+            this.featureTabs.Size = new System.Drawing.Size(2119, 1278);
+            this.featureTabs.TabIndex = 0;
             // 
             // DevicePanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.flowLayout);
+            this.Controls.Add(this.featureTabs);
             this.Name = "DevicePanel";
             this.Size = new System.Drawing.Size(2119, 1278);
             this.ResumeLayout(false);
@@ -54,6 +53,6 @@
 
         #endregion
 
-        public System.Windows.Forms.FlowLayoutPanel flowLayout;
+        public System.Windows.Forms.TabControl featureTabs;
     }
 }
